@@ -65,9 +65,12 @@ def dyn_properties_publisher():
                 markerp.pose.orientation.y = 0
                 markerp.pose.orientation.z = 0
                 markerp.pose.orientation.w = 1
-                markerp.scale.x = link.inertial.mass/250.
-                markerp.scale.y = link.inertial.mass/250.
-                markerp.scale.z = link.inertial.mass/250.
+                scale = link.inertial.mass/200.
+                if scale < 0.01:
+                    scale = 0.01
+                markerp.scale.x = scale
+                markerp.scale.y = scale
+                markerp.scale.z = scale
                 
                 markerp.color.r = 0.
                 markerp.color.g = 0.
