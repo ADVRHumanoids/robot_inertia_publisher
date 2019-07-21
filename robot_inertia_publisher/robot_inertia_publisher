@@ -4,20 +4,45 @@ import roslib; roslib.load_manifest('urdfdom_py')
 import rospy
 
 from urdf_parser_py.urdf import URDF
-from geometry_msgs.msg import InertiaStamped
+from geometry_msgs.msg import Inertia
 from visualization_msgs.msg import Marker, MarkerArray
+from robot_inertia_publisher.msg import InertiaWithLinkArray
+
 import PyKDL
 import numpy
 
 
 def dyn_properties_publisher():
-    rospy.init_node('robot_dyn_publisher', anonymous=True)
+    rospy.init_node('robot_inertia_publisher', anonymous=True)
     
     robot = URDF.from_parameter_server()
 
-    print(robot)
+    print('Start publish inertia info')
+
+    # Inertia is published once latched
+    inertias = InertiaWithLinkArray()
+    for link in robot.links:
+        if link.inertial != None:
+            i = Inertia()
+            i.com.x = link.inertial.origin.position[0]
+            i.com.y = link.inertial.origin.position[1]
+            i.com.z = link.inertial.origin.position[2]
+            i.m = link.inertial.mass
+            i.ixx = link.inertial.inertia.ixx
+            i.ixy = link.inertial.inertia.ixy
+            i.ixz = link.inertial.inertia.ixz
+            i.iyy = link.inertial.inertia.iyy
+            i.iyz = link.inertial.inertia.iyz
+            i.izz = link.inertial.inertia.izz
+            
+            inertias.inertias.append(i)
+            inertias.links.append(link.name)
     
+    pubi = rospy.Publisher("link_inertias", InertiaWithLinkArray, queue_size=1, latch = True)
+    pubi.publish(inertias)
+                
     
+    #Marker Array is published @10Hz
     rate = rospy.Rate(10) # 10hz
     while not rospy.is_shutdown():
         
@@ -29,20 +54,6 @@ def dyn_properties_publisher():
         for link in robot.links:
             if link.inertial != None:
                 
-                #inertial
-                i = InertiaStamped()
-                i.inertia.com.x = link.inertial.origin.position[0]
-                i.inertia.com.y = link.inertial.origin.position[1]
-                i.inertia.com.z = link.inertial.origin.position[2]
-                i.inertia.m = link.inertial.mass
-                i.inertia.ixx = link.inertial.inertia.ixx
-                i.inertia.ixy = link.inertial.inertia.ixy
-                i.inertia.ixz = link.inertial.inertia.ixz
-                i.inertia.iyy = link.inertial.inertia.iyy
-                i.inertia.iyz = link.inertial.inertia.iyz
-                i.inertia.izz = link.inertial.inertia.izz
-                i.header.frame_id = link.name
-                i.header.stamp = t                
                 
                 #cog
                 markerp = Marker()
@@ -122,15 +133,8 @@ def dyn_properties_publisher():
                 marker_array.markers.append(markerp)
                 marker_array.markers.append(markeri)
                 
-                #pubp = rospy.Publisher(link.name + "_cog", Marker, queue_size=1)
-                #pubp.publish(markerp)
-                pubi = rospy.Publisher(link.name + "_inertial", InertiaStamped, queue_size=1)
-                pubi.publish(i)
-                #pubm = rospy.Publisher(link.name + "_inertia", Marker, queue_size=1)
-                #pubm.publish(markeri)
                 
-                
-        pubm = rospy.Publisher("inertial_viz", MarkerArray, queue_size=1)
+        pubm = rospy.Publisher("link_inertias_viz", MarkerArray, queue_size=1)
         pubm.publish(marker_array) 
         
         rate.sleep()
