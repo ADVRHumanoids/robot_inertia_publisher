@@ -5,7 +5,7 @@ import rospy
 
 from urdf_parser_py.urdf import URDF
 from geometry_msgs.msg import InertiaStamped
-from visualization_msgs.msg import Marker
+from visualization_msgs.msg import Marker, MarkerArray
 import PyKDL
 import numpy
 
@@ -23,6 +23,9 @@ def dyn_properties_publisher():
         
         t = rospy.Time.now()        
         
+        marker_array = MarkerArray()
+        
+        _id = 0
         for link in robot.links:
             if link.inertial != None:
                 
@@ -65,6 +68,9 @@ def dyn_properties_publisher():
                 markerp.header.frame_id = link.name
                 markerp.header.stamp = t
                 markerp.text = link.name + "_cog"
+                
+                markerp.id = _id
+                _id = _id + 1
                 
                 
                 #inertia
@@ -109,16 +115,23 @@ def dyn_properties_publisher():
                 markeri.header.stamp = t
                 markeri.text = link.name + "_inertia"
                 
+                markeri.id = _id
+                _id = _id + 1
                 
-                pubp = rospy.Publisher(link.name + "_cog", Marker, queue_size=1)
-                pubp.publish(markerp)
+                
+                marker_array.markers.append(markerp)
+                marker_array.markers.append(markeri)
+                
+                #pubp = rospy.Publisher(link.name + "_cog", Marker, queue_size=1)
+                #pubp.publish(markerp)
                 pubi = rospy.Publisher(link.name + "_inertial", InertiaStamped, queue_size=1)
                 pubi.publish(i)
-                pubm = rospy.Publisher(link.name + "_inertia", Marker, queue_size=1)
-                pubm.publish(markeri)
+                #pubm = rospy.Publisher(link.name + "_inertia", Marker, queue_size=1)
+                #pubm.publish(markeri)
                 
                 
-        
+        pubm = rospy.Publisher("inertial_viz", MarkerArray, queue_size=1)
+        pubm.publish(marker_array) 
         
         rate.sleep()
 
