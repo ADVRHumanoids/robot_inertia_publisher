@@ -1,0 +1,130 @@
+#!/usr/bin/env python
+
+import roslib; roslib.load_manifest('urdfdom_py')
+import rospy
+
+from urdf_parser_py.urdf import URDF
+from geometry_msgs.msg import InertiaStamped
+from visualization_msgs.msg import Marker
+import PyKDL
+import numpy
+
+
+def dyn_properties_publisher():
+    rospy.init_node('robot_dyn_publisher', anonymous=True)
+    
+    robot = URDF.from_parameter_server()
+
+    print(robot)
+    
+    
+    rate = rospy.Rate(10) # 10hz
+    while not rospy.is_shutdown():
+        
+        t = rospy.Time.now()        
+        
+        for link in robot.links:
+            if link.inertial != None:
+                
+                #inertial
+                i = InertiaStamped()
+                i.inertia.com.x = link.inertial.origin.position[0]
+                i.inertia.com.y = link.inertial.origin.position[1]
+                i.inertia.com.z = link.inertial.origin.position[2]
+                i.inertia.m = link.inertial.mass
+                i.inertia.ixx = link.inertial.inertia.ixx
+                i.inertia.ixy = link.inertial.inertia.ixy
+                i.inertia.ixz = link.inertial.inertia.ixz
+                i.inertia.iyy = link.inertial.inertia.iyy
+                i.inertia.iyz = link.inertial.inertia.iyz
+                i.inertia.izz = link.inertial.inertia.izz
+                i.header.frame_id = link.name
+                i.header.stamp = t                
+                
+                #cog
+                markerp = Marker()
+                
+                markerp.pose.position.x = link.inertial.origin.position[0]
+                markerp.pose.position.y = link.inertial.origin.position[1]
+                markerp.pose.position.z = link.inertial.origin.position[2]
+                markerp.pose.orientation.x = 0
+                markerp.pose.orientation.y = 0
+                markerp.pose.orientation.z = 0
+                markerp.pose.orientation.w = 1
+                markerp.scale.x = link.inertial.mass/250.
+                markerp.scale.y = link.inertial.mass/250.
+                markerp.scale.z = link.inertial.mass/250.
+                
+                markerp.color.r = 0.
+                markerp.color.g = 0.
+                markerp.color.b = 1.
+                markerp.color.a = 0.5
+                
+                markerp.type = markerp.SPHERE
+                
+                markerp.header.frame_id = link.name
+                markerp.header.stamp = t
+                markerp.text = link.name + "_cog"
+                
+                
+                #inertia
+                markeri = Marker()
+                inertia = numpy.matrix([[link.inertial.inertia.ixx, link.inertial.inertia.ixy, link.inertial.inertia.ixz], 
+                                     [link.inertial.inertia.ixy, link.inertial.inertia.iyy, link.inertial.inertia.iyz], 
+                                     [link.inertial.inertia.ixz, link.inertial.inertia.iyz, link.inertial.inertia.izz]])
+                
+                (eigValues,eigVectors) = numpy.linalg.eig (inertia)
+
+                eigx_n=-PyKDL.Vector(eigVectors[0,0],eigVectors[1,0],eigVectors[2,0])
+                eigy_n=-PyKDL.Vector(eigVectors[0,1],eigVectors[1,1],eigVectors[2,1])
+                eigz_n=-PyKDL.Vector(eigVectors[0,2],eigVectors[1,2],eigVectors[2,2])
+                
+                rot = PyKDL.Rotation (eigx_n,eigy_n,eigz_n)
+                quat = rot.GetQuaternion ()
+ 
+ 
+                markeri.pose.position.x = link.inertial.origin.position[0]
+                markeri.pose.position.y = link.inertial.origin.position[1]
+                markeri.pose.position.z = link.inertial.origin.position[2]
+                markeri.pose.orientation.x = quat[0]
+                markeri.pose.orientation.y = quat[1]
+                markeri.pose.orientation.z = quat[2]
+                markeri.pose.orientation.w = quat[3]
+                
+                alpha = 2.*link.inertial.mass/5.       
+                
+                markeri.scale.x = 2.*numpy.sqrt((eigValues[1]+eigValues[2]-eigValues[0])/alpha)
+                markeri.scale.y = 2.*numpy.sqrt((eigValues[2]+eigValues[0]-eigValues[1])/alpha)
+                markeri.scale.z = 2.*numpy.sqrt((eigValues[0]+eigValues[1]-eigValues[2])/alpha)
+
+                
+                markeri.color.r = 1.
+                markeri.color.g = 0.
+                markeri.color.b = 0.
+                markeri.color.a = 0.5
+                
+                markeri.type = markeri.SPHERE
+                
+                markeri.header.frame_id = link.name
+                markeri.header.stamp = t
+                markeri.text = link.name + "_inertia"
+                
+                
+                pubp = rospy.Publisher(link.name + "_cog", Marker, queue_size=1)
+                pubp.publish(markerp)
+                pubi = rospy.Publisher(link.name + "_inertial", InertiaStamped, queue_size=1)
+                pubi.publish(i)
+                pubm = rospy.Publisher(link.name + "_inertia", Marker, queue_size=1)
+                pubm.publish(markeri)
+                
+                
+        
+        
+        rate.sleep()
+
+if __name__ == '__main__':
+    try:
+        dyn_properties_publisher()
+    except rospy.ROSInterruptException:
+        pass
+
