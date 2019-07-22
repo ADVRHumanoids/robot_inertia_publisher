@@ -1,0 +1,6 @@
+<launch>
+  <node name="robot_inertia_publisher" pkg="robot_inertia_publisher" type="robot_inertia_publisher" >
+  	<!-- param name="tf_prefix" value="ci" / -->
+  	<!-- param name="robot_description_param" value="robot_description" / -->
+  </node>
+</launch>
