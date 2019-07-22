@@ -15,7 +15,12 @@ import numpy
 def dyn_properties_publisher():
     rospy.init_node('robot_inertia_publisher', anonymous=True)
     
-    robot = URDF.from_parameter_server()
+    robot_description_param = rospy.get_param('~robot_description_param','robot_description')
+    tf_prefix = rospy.get_param('~tf_prefix','')  
+    if tf_prefix != '':
+        tf_prefix = tf_prefix + '/' 
+    
+    robot = URDF.from_parameter_server(robot_description_param)
 
     print('Start publish inertia info')
 
@@ -79,7 +84,7 @@ def dyn_properties_publisher():
                 
                 markerp.type = markerp.SPHERE
                 
-                markerp.header.frame_id = link.name
+                markerp.header.frame_id = tf_prefix + link.name
                 markerp.header.stamp = t
                 markerp.text = link.name + "_cog"
                 
@@ -125,7 +130,7 @@ def dyn_properties_publisher():
                 
                 markeri.type = markeri.SPHERE
                 
-                markeri.header.frame_id = link.name
+                markeri.header.frame_id = tf_prefix + link.name
                 markeri.header.stamp = t
                 markeri.text = link.name + "_inertia"
                 
