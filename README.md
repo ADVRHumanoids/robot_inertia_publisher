@@ -15,5 +15,7 @@ Node API
 - ```robot_description``` (```String```, default: ```robot_description```)
 - ```tf_prefix``` (```String```, default: None)
 
+![Inertias and CoGs for COMAN](https://github.com/ADVRHumanoids/robot_inertia_publisher/blob/master/robot_inertia_publisher.png)
+
 [1]: https://github.com/ADVRHumanoids/robot_inertia_publisher/blob/master/msg/InertiaWithLinkArray.msg "InertiaWithLinkArray"
 [2]: http://docs.ros.org/melodic/api/visualization_msgs/html/msg/MarkerArray.html "MarkerArray"
