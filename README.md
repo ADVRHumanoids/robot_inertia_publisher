@@ -4,7 +4,7 @@ robot_inertia_publisher
 Overview
 --------
 The ```robot_inertia_publisher``` permits to broadcast and visualize in RVIZ inertial information retrieved from the URDF description of a robot.
-Inertia is visualized as an ellipse aorund a spehere which represents the cog.
+Inertia of the single link is visualized as ellipsoid aorund a spehere which represents the cog of the link.
 
 Node API
 --------
