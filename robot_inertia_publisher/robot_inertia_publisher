@@ -131,11 +131,20 @@ def dyn_properties_publisher():
                 
                 alpha = 2.*link.inertial.mass/5.       
                 
-                markeri.scale.x = 2.*numpy.sqrt((eigValues[1]+eigValues[2]-eigValues[0])/alpha)
-                markeri.scale.y = 2.*numpy.sqrt((eigValues[2]+eigValues[0]-eigValues[1])/alpha)
-                markeri.scale.z = 2.*numpy.sqrt((eigValues[0]+eigValues[1]-eigValues[2])/alpha)
+		# print "======= Link %s ========" % link.name
+		# print "alpha = %s" % alpha
+		# print "eigValue[0] = %s" % eigValues[0]            
+		# print "eigValue[1] = %s" % eigValues[1] 
+		# print "eigValue[2] = %s" % eigValues[2]   
 
-                
+                markeri.scale.x = 2.*numpy.sqrt(numpy.absolute(eigValues[1]+eigValues[2]-eigValues[0])/alpha)
+                markeri.scale.y = 2.*numpy.sqrt(numpy.absolute(eigValues[2]+eigValues[0]-eigValues[1])/alpha)
+                markeri.scale.z = 2.*numpy.sqrt(numpy.absolute(eigValues[0]+eigValues[1]-eigValues[2])/alpha)
+
+		# print "markeri.scale.x = %s" % markeri.scale.x
+		# print "markeri.scale.y = %s" % markeri.scale.y
+		# print "markeri.scale.z = %s" % markeri.scale.z  
+
                 markeri.color.r = 1.
                 markeri.color.g = 0.
                 markeri.color.b = 0.
