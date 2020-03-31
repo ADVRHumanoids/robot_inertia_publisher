@@ -129,21 +129,22 @@ def dyn_properties_publisher():
                 markeri.pose.orientation.z = quat[2]
                 markeri.pose.orientation.w = quat[3]
                 
-                alpha = 2.*link.inertial.mass/5.       
-                
-		# print "======= Link %s ========" % link.name
-		# print "alpha = %s" % alpha
-		# print "eigValue[0] = %s" % eigValues[0]            
-		# print "eigValue[1] = %s" % eigValues[1] 
-		# print "eigValue[2] = %s" % eigValues[2]   
+                alpha = 2.*link.inertial.mass/5.
 
                 markeri.scale.x = 2.*numpy.sqrt(numpy.absolute(eigValues[1]+eigValues[2]-eigValues[0])/alpha)
                 markeri.scale.y = 2.*numpy.sqrt(numpy.absolute(eigValues[2]+eigValues[0]-eigValues[1])/alpha)
                 markeri.scale.z = 2.*numpy.sqrt(numpy.absolute(eigValues[0]+eigValues[1]-eigValues[2])/alpha)
 
-		# print "markeri.scale.x = %s" % markeri.scale.x
-		# print "markeri.scale.y = %s" % markeri.scale.y
-		# print "markeri.scale.z = %s" % markeri.scale.z  
+                #print "======= Link %s ========" % link.name
+                #print "mass = %s" % link.inertial.mass
+                #print "alpha = %s" % alpha
+                #print "eigValue[0] = %s" % eigValues[0]
+                #print "eigValue[1] = %s" % eigValues[1]
+                #print "eigValue[2] = %s" % eigValues[2]
+
+                #print "markeri.scale.x = %s" % markeri.scale.x
+                #print "markeri.scale.y = %s" % markeri.scale.y
+                #print "markeri.scale.z = %s" % markeri.scale.z
 
                 markeri.color.r = 1.
                 markeri.color.g = 0.
