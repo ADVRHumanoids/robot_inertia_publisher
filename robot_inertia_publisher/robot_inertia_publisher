@@ -29,14 +29,14 @@ def dyn_properties_publisher():
     for link in robot.links:
         if link.inertial != None:
             i = Inertia()
-	    if link.inertial.origin:
-            	i.com.x = link.inertial.origin.position[0]
-            	i.com.y = link.inertial.origin.position[1]
-            	i.com.z = link.inertial.origin.position[2]
-	    else:
-		i.com.x = 0.
-            	i.com.y = 0.
-            	i.com.z = 0.
+            if link.inertial.origin:
+                i.com.x = link.inertial.origin.position[0]
+                i.com.y = link.inertial.origin.position[1]
+                i.com.z = link.inertial.origin.position[2]
+            else:
+                i.com.x = 0.
+                i.com.y = 0.
+                i.com.z = 0.
             i.m = link.inertial.mass
             i.ixx = link.inertial.inertia.ixx
             i.ixy = link.inertial.inertia.ixy
@@ -71,8 +71,8 @@ def dyn_properties_publisher():
                     markerp.pose.position.x = link.inertial.origin.position[0]
                     markerp.pose.position.y = link.inertial.origin.position[1]
                     markerp.pose.position.z = link.inertial.origin.position[2]
-		else:
-		    markerp.pose.position.x = 0.
+                else:
+                    markerp.pose.position.x = 0.
                     markerp.pose.position.y = 0.
                     markerp.pose.position.z = 0.
                 markerp.pose.orientation.x = 0
@@ -116,12 +116,12 @@ def dyn_properties_publisher():
                 rot = PyKDL.Rotation (eigx_n,eigy_n,eigz_n)
                 quat = rot.GetQuaternion ()
  
- 		if link.inertial.origin:
+                if link.inertial.origin:
                     markeri.pose.position.x = link.inertial.origin.position[0]
                     markeri.pose.position.y = link.inertial.origin.position[1]
                     markeri.pose.position.z = link.inertial.origin.position[2]
-		else:
-		    markeri.pose.position.x = 0.
+                else:
+                    markeri.pose.position.x = 0.
                     markeri.pose.position.y = 0.
                     markeri.pose.position.z = 0.
                 markeri.pose.orientation.x = quat[0]
