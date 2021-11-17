@@ -15,8 +15,8 @@ import numpy
 def dyn_properties_publisher():
     rospy.init_node('robot_inertia_publisher', anonymous=True)
     
-    robot_description_param = rospy.get_param('~robot_description','robot_description')
-    tf_prefix = rospy.get_param('~tf_prefix','')  
+    robot_description_param = rospy.get_param('~robot_description', 'robot_description')
+    tf_prefix = rospy.get_param('~tf_prefix', '')
     if tf_prefix != '':
         tf_prefix = tf_prefix + '/' 
     
@@ -160,7 +160,9 @@ def dyn_properties_publisher():
                 markeri.id = _id
                 _id = _id + 1
                 
-                
+                markerp.ns = link.name + "_com"
+                markeri.ns = link.name + "_inertia"
+
                 marker_array.markers.append(markerp)
                 marker_array.markers.append(markeri)
                 
