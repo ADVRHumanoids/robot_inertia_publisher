@@ -7,6 +7,7 @@ from urdf_parser_py.urdf import URDF
 from geometry_msgs.msg import Inertia
 from visualization_msgs.msg import Marker, MarkerArray
 from robot_inertia_publisher.msg import InertiaWithLinkArray
+from std_msgs.msg import Float32
 
 import PyKDL
 import numpy
@@ -26,6 +27,7 @@ def dyn_properties_publisher():
 
     # Inertia is published once latched
     inertias = InertiaWithLinkArray()
+    mass = 0.
     for link in robot.links:
         if link.inertial != None:
             i = Inertia()
@@ -47,9 +49,14 @@ def dyn_properties_publisher():
             
             inertias.inertias.append(i)
             inertias.links.append(link.name)
+
+            mass += link.inertial.mass
     
     pubi = rospy.Publisher("link_inertias", InertiaWithLinkArray, queue_size=1, latch = True)
     pubi.publish(inertias)
+
+    pubtm = rospy.Publisher("total_mass", Float32, queue_size=1, latch=True)
+    pubtm.publish(mass)
                 
     
     #Marker Array is published @10Hz

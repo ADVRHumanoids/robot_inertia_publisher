@@ -11,6 +11,7 @@ Node API
 ### Published Topics
 - ```link_inertias``` ([InertiaWithLinkArray][1])
 - ```link_inertias_viz``` ([MarkerArray][2])
+- ```total_mass``` ([Float32])
 ### Parameters
 - ```robot_description``` (```String```, default: ```robot_description```)
 - ```tf_prefix``` (```String```, default: None)
