@@ -68,6 +68,7 @@ def dyn_properties_publisher():
         marker_array = MarkerArray()
         
         _id = 0
+        #total_mass = 0.
         for link in robot.links:
             if link.inertial != None:
                 
@@ -143,6 +144,7 @@ def dyn_properties_publisher():
                 markeri.scale.z = 2.*numpy.sqrt(numpy.absolute(eigValues[0]+eigValues[1]-eigValues[2])/alpha)
 
                 #print "======= Link %s ========" % link.name
+                #total_mass += link.inertial.mass
                 #print "mass = %s" % link.inertial.mass
                 #print "alpha = %s" % alpha
                 #print "eigValue[0] = %s" % eigValues[0]
@@ -173,9 +175,11 @@ def dyn_properties_publisher():
                 marker_array.markers.append(markerp)
                 marker_array.markers.append(markeri)
                 
-                
+        #print(f"total mass: {total_mass}")
         pubm = rospy.Publisher("link_inertias_viz", MarkerArray, queue_size=1)
-        pubm.publish(marker_array) 
+        pubm.publish(marker_array)
+
+
         
         rate.sleep()
 
